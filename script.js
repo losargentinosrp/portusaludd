@@ -11,8 +11,9 @@ const defaultState = {
       description: "Ensalada fresca con pollo, verduras y aderezo light.",
       value: "$1.800",
       category: "",
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
-      visible: true
+      image:
+        "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+      visible: true,
     },
     {
       id: 2,
@@ -20,10 +21,11 @@ const defaultState = {
       description: "Arroz, carne hervida, vegetales y salsa casera.",
       value: "$2.400",
       category: "",
-      image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80",
-      visible: true
-    }
-  ]
+      image:
+        "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80",
+      visible: true,
+    },
+  ],
 };
 
 const categoryRow = document.getElementById("categoryRow");
@@ -36,6 +38,7 @@ const modalBody = document.getElementById("modalBody");
 const modalActions = document.getElementById("modalActions");
 const createCategoryBtn = document.getElementById("createCategoryBtn");
 const createPublicationBtn = document.getElementById("createPublicationBtn");
+const adminBtn = document.getElementById("adminBtn");
 const modalCard = document.getElementById("modalCard");
 const modalHeader = document.querySelector(".modal-header");
 
@@ -59,11 +62,19 @@ function normalizeText(value) {
     .trim();
 }
 
+function renderRoleControls() {
+  const isOwner = state.role === "Propietario";
+  createCategoryBtn.classList.toggle("hidden", !isOwner);
+  createPublicationBtn.classList.toggle("hidden", !isOwner);
+  adminBtn.classList.toggle("hidden", !isOwner);
+}
+
 function renderCategories() {
   categoryRow.innerHTML = "";
 
   if (!state.categories.length) {
-    categoryRow.innerHTML = '<div class="product-desc">Aún no hay categorías creadas.</div>';
+    categoryRow.innerHTML =
+      '<div class="product-desc">Aún no hay categorías creadas.</div>';
     return;
   }
 
@@ -95,18 +106,18 @@ function renderCategories() {
 
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Eliminar";
-      deleteBtn.dataset.deleteCategory = cat;
-
-      deleteBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
+      deleteBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
         deleteCategory(cat);
       });
 
       menu.appendChild(deleteBtn);
 
-      menuBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        document.querySelectorAll(".category-menu").forEach((m) => m.classList.remove("active"));
+      menuBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        document
+          .querySelectorAll(".category-menu")
+          .forEach((m) => m.classList.remove("active"));
         menu.classList.toggle("active");
       });
 
@@ -120,12 +131,10 @@ function renderCategories() {
 
 function deleteCategory(categoryName) {
   if (!categoryName) return;
-
   const confirmed = confirm(`¿Querés eliminar la categoría "${categoryName}"?`);
   if (!confirmed) return;
 
   state.categories = state.categories.filter((cat) => cat !== categoryName);
-
   state.products = state.products.map((product) =>
     product.category === categoryName ? { ...product, category: "" } : product
   );
@@ -149,8 +158,8 @@ function renderProducts() {
 
     const matchesText =
       !query ||
-      [product.name, product.description, product.category, product.value].some((field) =>
-        normalizeText(field).includes(query)
+      [product.name, product.description, product.category, product.value].some(
+        (field) => normalizeText(field).includes(query)
       );
 
     return matchesCategory && matchesText;
@@ -168,7 +177,9 @@ function renderProducts() {
     const card = document.createElement("article");
     card.className = "product-card";
     card.innerHTML = `
-      <img src="${product.image || "https://via.placeholder.com/400x240?text=Producto"}" alt="${product.name}" />
+      <img src="${
+        product.image || "https://via.placeholder.com/400x240?text=Producto"
+      }" alt="${product.name}" />
       <div class="product-body">
         <div class="product-name">${product.name}</div>
         <div class="product-desc">${product.description}</div>
@@ -191,7 +202,6 @@ function showModal(title, bodyHtml, actionsHtml) {
   modalActions.innerHTML = actionsHtml;
   modal.classList.add("active");
   modal.setAttribute("aria-hidden", "false");
-
   modalCard.style.top = "0px";
   modalCard.style.left = "0px";
   modalCard.classList.remove("dragging");
@@ -212,7 +222,7 @@ function startDrag(event) {
     startX: event.clientX,
     startY: event.clientY,
     startTop: parseInt(modalCard.style.top || "0", 10),
-    startLeft: parseInt(modalCard.style.left || "0", 10)
+    startLeft: parseInt(modalCard.style.left || "0", 10),
   };
 
   modalCard.classList.add("dragging");
@@ -222,10 +232,8 @@ function startDrag(event) {
 
 function onDrag(event) {
   if (!dragState) return;
-
   const deltaX = event.clientX - dragState.startX;
   const deltaY = event.clientY - dragState.startY;
-
   modalCard.style.top = `${dragState.startTop + deltaY}px`;
   modalCard.style.left = `${dragState.startLeft + deltaX}px`;
 }
@@ -237,10 +245,20 @@ function stopDrag() {
   document.body.style.userSelect = "";
 }
 
-modalHeader.addEventListener("pointerdown", startDrag);
-window.addEventListener("pointermove", onDrag);
-window.addEventListener("pointerup", stopDrag);
-window.addEventListener("pointercancel", stopDrag);
+function openAdminPanel() {
+  const html = `
+    <div class="field">
+      <strong>Panel de administrador</strong>
+      <p>Desde aquí podés gestionar categorías y publicaciones.</p>
+    </div>
+  `;
+  const actions = `
+    <button class="btn" id="closeAdminBtn">Cerrar</button>
+  `;
+
+  showModal("Panel de administrador", html, actions);
+  document.getElementById("closeAdminBtn").addEventListener("click", closeModal);
+}
 
 function openCreateCategoryModal() {
   const html = `
@@ -249,7 +267,6 @@ function openCreateCategoryModal() {
       <input id="categoryName" type="text" placeholder="Ej: Postres" />
     </div>
   `;
-
   const actions = `
     <button class="btn" id="saveCategoryBtn">Crear</button>
     <button class="btn secondary" id="cancelCategoryBtn">Cancelar</button>
@@ -261,18 +278,21 @@ function openCreateCategoryModal() {
     const name = document.getElementById("categoryName").value.trim();
     if (!name) return;
     if (!state.categories.includes(name)) state.categories.push(name);
-
     saveState();
     renderCategories();
     closeModal();
   });
 
-  document.getElementById("cancelCategoryBtn").addEventListener("click", closeModal);
+  document
+    .getElementById("cancelCategoryBtn")
+    .addEventListener("click", closeModal);
 }
 
 function openCreatePublicationModal() {
   const options = state.categories.length
-    ? state.categories.map((c) => `<option value="${c}">${c}</option>`).join("")
+    ? state.categories
+        .map((cat) => `<option value="${cat}">${cat}</option>`)
+        .join("")
     : '<option value="">Sin categoría</option>';
 
   const html = `
@@ -293,7 +313,6 @@ function openCreatePublicationModal() {
       <select id="productCategory">${options}</select>
     </div>
   `;
-
   const actions = `
     <button class="btn" id="savePublicationBtn">Crear</button>
     <button class="btn secondary" id="cancelPublicationBtn">Cancelar</button>
@@ -301,39 +320,45 @@ function openCreatePublicationModal() {
 
   showModal("Crear publicación", html, actions);
 
-  document.getElementById("savePublicationBtn").addEventListener("click", () => {
-    const name = document.getElementById("productName").value.trim();
-    const description = document.getElementById("productDescription").value.trim();
-    const value = document.getElementById("productValue").value.trim();
-    const category = document.getElementById("productCategory").value;
+  document
+    .getElementById("savePublicationBtn")
+    .addEventListener("click", () => {
+      const name = document.getElementById("productName").value.trim();
+      const description = document.getElementById("productDescription").value.trim();
+      const value = document.getElementById("productValue").value.trim();
+      const category = document.getElementById("productCategory").value;
 
-    if (!name || !description || !value) return;
+      if (!name || !description || !value) return;
 
-    state.products.unshift({
-      id: Date.now(),
-      name,
-      description,
-      value,
-      category,
-      image: "",
-      visible: true
+      state.products.unshift({
+        id: Date.now(),
+        name,
+        description,
+        value,
+        category,
+        image: "",
+        visible: true,
+      });
+
+      saveState();
+      renderProducts();
+      closeModal();
     });
 
-    saveState();
-    renderProducts();
-    closeModal();
-  });
-
-  document.getElementById("cancelPublicationBtn").addEventListener("click", closeModal);
+  document
+    .getElementById("cancelPublicationBtn")
+    .addEventListener("click", closeModal);
 }
 
 createCategoryBtn.addEventListener("click", openCreateCategoryModal);
 createPublicationBtn.addEventListener("click", openCreatePublicationModal);
+adminBtn.addEventListener("click", openAdminPanel);
 searchInput.addEventListener("input", renderProducts);
 
 roleSelect.addEventListener("change", (event) => {
   state.role = event.target.value;
   saveState();
+  renderRoleControls();
   renderCategories();
   renderProducts();
 });
@@ -341,14 +366,18 @@ roleSelect.addEventListener("change", (event) => {
 productsGrid.addEventListener("click", (event) => {
   const buyButton = event.target.closest("[data-buy]");
   if (!buyButton) return;
-
   const productId = Number(buyButton.dataset.buy);
   const product = state.products.find((item) => item.id === productId);
-
   if (!product) return;
 
-  const message = encodeURIComponent(`Hola, quiero comprar ${product.name} por ${product.value}.`);
-  window.open(`https://wa.me/5493462619313?text=${message}`, "_blank", "noopener,noreferrer");
+  const message = encodeURIComponent(
+    `Hola, quiero comprar ${product.name} por ${product.value}.`
+  );
+  window.open(
+    `https://wa.me/5493462619313?text=${message}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
 });
 
 modal.addEventListener("click", (event) => {
@@ -357,17 +386,23 @@ modal.addEventListener("click", (event) => {
 
 document.addEventListener("click", (event) => {
   if (!event.target.closest(".category-item")) {
-    document.querySelectorAll(".category-menu").forEach((menu) => menu.classList.remove("active"));
+    document
+      .querySelectorAll(".category-menu")
+      .forEach((menu) => menu.classList.remove("active"));
   }
 });
 
+if (modalHeader) {
+  modalHeader.addEventListener("pointerdown", startDrag);
+}
+window.addEventListener("pointermove", onDrag);
+window.addEventListener("pointerup", stopDrag);
+window.addEventListener("pointercancel", stopDrag);
+
 function renderAll() {
+  renderRoleControls();
   renderCategories();
   renderProducts();
 }
-
-renderAll();
-initRealtimeSync();
-setInterval(saveState, 5000);
 
 renderAll();
