@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Por Tu Salud</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  </head>
+  <body>
+    <section class="hero">
+      <div class="hero-card">
+        <img
+          class="hero-image"
+          src="https://cdn.discordapp.com/attachments/1470129308562620498/1531358487861530844/awp5zKtGybRJWQP8sHPO.jpg?ex=6a6a3dba&is=6a68ec3a&hm=d8b9280961c1cde6a95a96fbe37e64d5463205fbe556854c0e2009a9dfc353a7"
+          alt="Por Tu Salud"
+        />
+        <h1>Por Tu Salud</h1>
+        <p>
+          SOY NUTRICIONISTA. Te brindamos una alimentación saludable lista para
+          stockear tu heladera, freezer y consumir cuando quieras. Opciones ricas
+          y nutritivas para facilitar tu alimentación saludable. Horario: de
+          lunes a viernes de 8:30 a 13:30.
+        </p>
+        <div class="address">
+          Deán Funes 455, Venado Tuerto, Santa Fe, Argentina · Teléfono: +54 9
+          3462 61-9313
+        </div>
+        <div class="hero-actions">
+          <a
+            class="btn"
+            href="https://wa.me/5493462619313"
+            target="_blank"
+            rel="noopener noreferrer"
+            >WhatsApp</a
+          >
+          <a
+            class="btn secondary"
+            href="https://www.instagram.com/portusaludviandas"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Instagram</a
+          >
+          <a
+            class="btn ghost"
+            href="https://www.google.com/maps/search/?api=1&query=De%C3%A1n%20Funes%20455%2C%20Venado%20Tuerto%2C%20Santa%20Fe%2C%20Argentina"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Ubicación</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <main class="container">
+      <div id="roleBar" class="role-bar hidden">
+        <label for="roleSelect">Rol</label>
+        <select id="roleSelect">
+          <option value="Visitante">Visitante</option>
+          <option value="Propietario">Propietario</option>
+        </select>
+      </div>
+
+      <div class="search-wrap">
+        <div class="search-box">
+          <span class="icon">🔎</span>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Buscar viandas, ensaladas, postres..."
+          />
+        </div>
+      </div>
+
+      <div class="section-title">Categorías</div>
+      <div class="divider"></div>
+      <div id="categoryRow" class="category-row"></div>
+
+      <div class="admin-actions">
+        <button id="adminBtn" class="btn hidden">Panel de administrador</button>
+        <button id="createCategoryBtn" class="btn secondary hidden">
+          Crear categoría
+        </button>
+        <button id="createPublicationBtn" class="btn hidden">
+          Crear publicación
+        </button>
+      </div>
+
+      <div class="section-title">Publicaciones</div>
+      <div class="divider"></div>
+      <div id="products" class="products-grid"></div>
+    </main>
+
+    <div id="modal" class="modal" aria-hidden="true">
+      <div class="modal-card">
+        <h3 id="modalTitle"></h3>
+        <div id="modalBody"></div>
+        <div id="modalActions" class="modal-actions"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
